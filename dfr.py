@@ -10,8 +10,7 @@ class DialogFeedReader:
     def __init__(self):
         self.parse = HTMLParser()
         self.link_list = self.read_feedlinks()
-        self.news_titles = []
-        self.news_links = []
+        self.news = []
         self.get_feed()
 
 
@@ -32,19 +31,27 @@ class DialogFeedReader:
     def get_feed(self):
         print('\nFetching news feed\n')
         for link in self.link_list:
-            req = urlopen(link).read()
+            try:
+                req = urlopen(link).read()
+            except ValueError:
+                print('\nInvalid link, skipping\n')
             tree = ET.ElementTree(ET.fromstring(req)).getroot()
             for i in tree.iter('title'):
-                self.news_titles.append(self.parse.unescape(i.text))
-            for i in tree.iter('link'):
-                self.news_links.append(self.parse.unescape(i.text))
-
+                source_name = i.text.split('-')[0]
+                break
+            for e in tree.iter('item'): 
+                news_element = []
+                news_element.append(self.parse.unescape(e.find('title').text))
+                news_element.append(self.parse.unescape(e.find('link').text))
+                news_element.append(self.parse.unescape(e.find('description').text.split('<')[0]))
+                news_element.append(source_name)
+                self.news.append(news_element)
 
 
     def print_feedtitles(self):
         print('\nNews Feed:\n')
-        for i in range(0, len(self.news_titles)):
-            print('[{}] {}'.format(i + 1, self.news_titles[i]))
+        for i in range(0, len(self.news)):
+            print('[{}] {} - {}'.format(i + 1, self.news[i][0], self.news[i][3]))
         print('\n')
 
 
@@ -62,8 +69,20 @@ class DialogFeedReader:
 
     def print_link(self):
         num = int(input('\nEnter line number of to get link for: '))
-        if (num - 1) < len(self.news_titles):
-            print('\nLink:\n{}\n'.format(self.news_links[num - 1]))
+        try:
+            if (num - 1) < len(self.news):
+                print('\nLink:\n{}\n'.format(self.news[num - 1][1]))
+        except ValueError:
+            print('\nWrong number input\n')
+
+
+    def print_description(self):
+        num = int(input('\nEnter line number of to get link for: '))
+        try: 
+            if (num - 1) < len(self.news):
+                print('\Description:\n{}\n'.format(self.news[num - 1][2]))
+        except ValueError:
+            print('\nWrong number input\n')
 
 
 root = DialogFeedReader()
@@ -71,7 +90,8 @@ help = '''\nAvailable commands:
 (a)dd new RSS feed link
 (u)pdate feed 
 (p)rint titles
-(g)et news link 
+(g)et news link
+(r)ead link description
 (q)uit\n'''
 
 while(True):
@@ -86,6 +106,8 @@ while(True):
             root.get_feed()
         elif command == 'G':
             root.print_link()
+        elif command == 'R':
+            root.print_description()
         elif command == 'Q':
             break
         else:
