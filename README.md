@@ -1,6 +1,6 @@
 # DFR
 
-CLI RSS feed reading tool with interactive workflow.
+CLI RSS feed reading tool with interactive workflow, written in Python3.
 
 Links are stored in a single text file - feed.txt 
 
