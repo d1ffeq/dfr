@@ -68,8 +68,8 @@ class DialogFeedReader:
 
 
     def print_link(self):
-        num = int(input('\nEnter line number of to get link for: '))
         try:
+            num = int(input('\nEnter line number of to get link for: '))
             if (num - 1) < len(self.news):
                 print('\nLink:\n{}\n'.format(self.news[num - 1][1]))
         except ValueError:
@@ -77,8 +77,8 @@ class DialogFeedReader:
 
 
     def print_description(self):
-        num = int(input('\nEnter line number of to get link for: '))
         try: 
+            num = int(input('\nEnter line number of to get link for: '))
             if (num - 1) < len(self.news):
                 print('\Description:\n{}\n'.format(self.news[num - 1][2]))
         except ValueError:
